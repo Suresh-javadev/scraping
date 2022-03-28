@@ -10,7 +10,7 @@ public class LoadDriver {
 	private LoadDriver() {}
 	
 	public static WebDriver driver() {	
-		 WebDriverManager.chromedriver().setup();
+	   WebDriverManager.chromedriver().setup();
 	   return new ChromeDriver();
 	}
 }

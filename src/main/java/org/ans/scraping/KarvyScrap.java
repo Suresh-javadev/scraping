@@ -6,6 +6,7 @@ import org.ans.scraping.exception.FailToLoadSiteException;
 import org.ans.scraping.exception.LoginException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 @Component
-@Scope("prototype")
+@Scope(scopeName="prototype")
 public class KarvyScrap implements Closeable{
 	
 	@Value("${karvy.userid.input}")
@@ -55,7 +56,7 @@ public class KarvyScrap implements Closeable{
 		pageLoad();
 		
 		if(!isSiteWorking()) {
-			this.driver.close();
+			this.close();
 			throw new FailToLoadSiteException("Site is down or not reachable");
 		}
 		
@@ -78,10 +79,16 @@ public class KarvyScrap implements Closeable{
 		driver.findElement(By.id(captchaInputLocator)).sendKeys(captchaText);
 		jse.executeScript("document.getElementById('"+loginSubmitLocator+"').click();");
 		
+		if(isAlertPresent()) {
+			this.close();
+			throw new LoginException("Username or password invalid");
+		}
+				
+		
 		pageLoad();
 		
 		if(driver.getCurrentUrl().equalsIgnoreCase(karvyUrl)) {
-			this.driver.close();
+			this.close();
 			throw new LoginException("Username or password invalid");
 		}	
 		return this;
@@ -152,5 +159,15 @@ public class KarvyScrap implements Closeable{
 	
 	private boolean isSiteWorking() {
 		return this.driver.getPageSource().contains("User ID") && this.driver.getPageSource().contains("Password");
+	}
+	
+	private boolean isAlertPresent() 
+	{ 
+	    try { 
+	        this.driver.switchTo().alert(); 
+	        return true; 
+	    } catch (NoAlertPresentException Ex){ 
+	        return false; 
+	    }   
 	}
 }
