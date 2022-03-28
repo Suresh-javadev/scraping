@@ -1,28 +1,36 @@
 package org.ans.scraping;
 
+import org.ans.scraping.exception.FailToLoadSiteException;
+import org.ans.scraping.exception.LoginException;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class ScrapController {
-	@Value("${karvy.login.url}")
-	private String karvyUrl;
+
 	@Autowired
 	private KarvyScrap scrap;
 	
-	@GetMapping("/scrap")
-	public String scrap() {
+	@PostMapping("/scrap")
+	public String scrap(@RequestBody ScrapingRequest req) {
 		WebDriver driver= LoadDriver.driver();
-				scrap
-				.setDriver(driver)
-				.start(karvyUrl)
-				.login("testusername", "ndtfdsf")
-				.close();
 		
-		return "hello";
+		try {
+				scrap
+				.setDriver(driver,req)
+				.start()
+				.close();
+		}catch(FailToLoadSiteException | LoginException e) {
+			return e.getMessage();
+		}catch(Exception e) {
+			scrap.close();
+			return e.getMessage();
+		}
+		
+		return scrap.refNo();
 	}
 
 }
