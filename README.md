@@ -1,7 +1,9 @@
 url: localhost:18080/scrap
+<br>
 method: POST
-
+<br>
 requestBody:
+<br>
 contentType: application/json
 body:
 {
