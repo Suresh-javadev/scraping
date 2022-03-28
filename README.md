@@ -5,7 +5,9 @@ method: POST
 requestBody:
 <br>
 contentType: application/json
+<br>
 body:
+<br>
 {
     "username":"youruser",
     "password":"yourpassword",
@@ -20,9 +22,12 @@ body:
     ]
 
 }
-
+<br>
 Currently only mfsd246 supported.
+<br>
 mdsd246: folio wise transaction report
+<br>
 required amc wise folio record.
+<br>
 
 on success you will get refno
