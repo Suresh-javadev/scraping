@@ -1,6 +1,7 @@
 package org.ans.scraping;
 
 import java.io.Closeable;
+import java.io.IOException;
 
 import org.ans.scraping.exception.FailToLoadSiteException;
 import org.ans.scraping.exception.LoginException;
@@ -8,6 +9,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -16,6 +19,10 @@ import org.springframework.util.Assert;
 @Component
 @Scope(scopeName="prototype")
 public class KarvyScrap implements Closeable{
+	
+	
+	@Value("${basepath}")
+	private String basepath;	
 	
 	@Value("${karvy.userid.input}")
 	private String usernameLocator;
@@ -31,11 +38,23 @@ public class KarvyScrap implements Closeable{
 	private String karvyUrl; 
 	@Value("${karvy.report.url}")
 	private String karvyReportConsoleUrl;
+	
+	//MFSD246
 	@Value("${karvy.MFSD246.url}")
 	private String mfsd246Url;
 	@Value("${karvy.mfsd246.asondate.locator}")
 	private String mfsd246AsondateLocator;
-
+	@Value("${karvy.mfsd246.amcselect.locator}")
+	private String mfsd246AmcSelectLocator;
+	@Value("${karvy.mfsd246.email0.locator}")
+	private String mfsd246EmailLocator;
+	@Value("${karvy.mfsd246.fileupload.locator}")
+	private String mfsd246FileuploadLocator;
+	@Value("${karvy.mfsd246.filedbf.locator}")
+	private String mfsd246dbffileLocator;
+	@Value("${karvy.mfsd246.submit.locator}")
+	private String mfsd246submitLocator;
+	
 	private WebDriver driver;
 	private String refNo="";
 	private FileRequestInput input;
@@ -51,7 +70,7 @@ public class KarvyScrap implements Closeable{
 		return this;
 	}
 	
-	public KarvyScrap start() throws FailToLoadSiteException{
+	public KarvyScrap start() throws FailToLoadSiteException, LoginException, IOException{
 		this.driver.get(karvyUrl);
 		pageLoad();
 		
@@ -100,27 +119,52 @@ public class KarvyScrap implements Closeable{
 		return this;
 	}
 	
-	public KarvyScrap filetype() {
+	public KarvyScrap filetype() throws IOException {
 		
 		if(this.input.getFiletype().equalsIgnoreCase("mfsd246")) {
 			this.mfsd246();
 		}
 		return this;
 	}
-	public void mfsd246() {
+	public void mfsd246() throws IOException {
 		this.driver.get(mfsd246Url);
 		Assert.hasLength(this.input.getAmc(), "For mfsd246 amc can't be null");
 	    Assert.notNull(this.input.getFoliolist(), "For mfsd246 folio list can't be null");
 	    Assert.isTrue(!this.input.getFoliolist().isEmpty(),"Folio list size can't be zero");
 	    Assert.isTrue(this.input.getFoliolist().size()<=500,"Folio list size can't be grater than 500");
+	    JavascriptExecutor jse = (JavascriptExecutor)this.driver;
 	    
 	    if(this.input.getAsOnDate()) {
-	    	JavascriptExecutor jse = (JavascriptExecutor)this.driver;
+	    	
 	    	jse.executeScript("document.getElementById('"+mfsd246AsondateLocator+"').click();");
 	    }else{
 	    	  Assert.notNull(this.input.getFromdate(), "From date required");
 	    	  Assert.notNull(this.input.getTodate(), "To Date required");
 	    }
+	    
+	    
+	    Select amc = new Select(driver.findElement(By.id(mfsd246AmcSelectLocator)));
+	    amc.selectByValue(this.input.getAmc());
+	    
+	    
+	    
+	    WebElement uploadElement = this.driver.findElement(By.id(mfsd246FileuploadLocator));
+
+	    String filePath=FileCreationForFolioUpload.createFileFromFolio( this.input.getFoliolist());
+        // enter the file path onto the file-selection input field
+	    String filepath=basepath+filePath;
+        uploadElement.sendKeys(filepath);
+        
+    	jse.executeScript("document.getElementById('"+mfsd246EmailLocator+"').click();");
+    	
+    	jse.executeScript("document.getElementById('"+mfsd246dbffileLocator+"').click();");
+    	
+    	
+    	driver.findElement(By.id("ctl00_MiddleContent_filefrmt_txtZipPwd")).sendKeys(input.getZipPassword());
+    	
+    	driver.findElement(By.id("ctl00_MiddleContent_filefrmt_txtconfirmzippwd")).sendKeys(input.getZipPassword());
+    	
+    	jse.executeScript("document.getElementById('"+mfsd246submitLocator+"').click();");
 	    
 	    pageLoad();
 	}

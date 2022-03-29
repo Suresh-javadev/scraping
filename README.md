@@ -9,16 +9,17 @@ contentType: application/json
 body:
 <br>
 {
-    "username":"youruser",
-    "password":"yourpassword",
+    "username":"x",
+    "password":"y",
     "fromdate":"",
     "todate":"",
     "asOnDate":true,
-    "amc":"123",
+    "amc":"RMF",
+    "zipPassword":"abcd1234",
     "filetype":"mfsd246",
     "foliolist":[
-        "12345",
-        "56789"
+        "123456",
+        "567859"
     ]
 
 }

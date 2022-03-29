@@ -12,6 +12,7 @@ public class ScrapingRequest implements FileRequestInput{
 	private String filetype;
 	private Date fromdate;
 	private Date todate;
+	private String zipPassword;
 	private boolean asOnDate;
 	private List<String> foliolist;
 	
@@ -85,5 +86,14 @@ public class ScrapingRequest implements FileRequestInput{
 
 	public void setFoliolist(List<String> foliolist) {
 		this.foliolist = foliolist;
+	}
+
+	@Override
+	public String getZipPassword() {		
+		return this.zipPassword;
+	}	
+	
+	public String setZipPassword(String zipPassword) {		
+		return this.zipPassword = zipPassword;
 	}	
 }

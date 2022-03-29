@@ -10,6 +10,7 @@ public interface FileRequestInput {
 	public String getFiletype();
 	public Date getFromdate();
 	public Date getTodate();
+	public String getZipPassword();
 	public boolean getAsOnDate();
 	public List<String> getFoliolist();
 }

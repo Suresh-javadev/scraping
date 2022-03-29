@@ -57,3 +57,4 @@ local.properties
 .texlipse
 #Log file
 log-*.txt
+*_list.txt
