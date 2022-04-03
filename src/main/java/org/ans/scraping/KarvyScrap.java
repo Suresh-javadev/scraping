@@ -2,6 +2,8 @@ package org.ans.scraping;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.List;
 
 import org.ans.scraping.exception.FailToLoadSiteException;
 import org.ans.scraping.exception.LoginException;
@@ -54,6 +56,30 @@ public class KarvyScrap implements Closeable{
 	private String mfsd246dbffileLocator;
 	@Value("${karvy.mfsd246.submit.locator}")
 	private String mfsd246submitLocator;
+	
+	
+	//mfsd203 aum
+	@Value("${karvy.MFSD203.url}")
+	private String mfsd203Url;
+	@Value("${karvy.mfsd203.asondateradio.locator}")
+	private String karvyMfsd203asonradioLocator;
+	@Value("${karvy.mfsd203.asondateinput.locator}")
+	private String karvyMfsd203asoninputLocator;
+	@Value("${karvy.mfsd203.allamcselect.locator}")
+	private String karvyMfsd203allAmcSelctLocator;
+	@Value("${karvy.mfsd203.emailselect.locator}")
+	private String karvyMfsd203emailselctLocator;
+	@Value("${karvy.mfsd203.withzerobal.locator}")
+	private String karvyMfsd203withzerobalLocator;
+	@Value("${karvy.mfsd203.dbffile.locator}")
+	private String karvyMfsd203dbffileLocator;
+	@Value("${karvy.mfsd203.zippass1.locator}")
+	private String karvyMfsd203zippas1Locator;
+	@Value("${karvy.mfsd203.zippass2.locator}")
+	private String karvyMfsd203zippas2Locator;
+	@Value("${karvy.mfsd203.submit.locator}")
+	private String karvyMfsd203submitLocator;
+
 	
 	private WebDriver driver;
 	private String refNo="";
@@ -123,11 +149,19 @@ public class KarvyScrap implements Closeable{
 		
 		if(this.input.getFiletype().equalsIgnoreCase("mfsd246")) {
 			this.mfsd246();
+		}else if(this.input.getFiletype().equalsIgnoreCase("mfsd203")) {
+			this.mfsd203();
 		}
 		return this;
 	}
+	
+	/**
+	 * Folio wise trxn file
+	 * @throws IOException
+	 */
 	public void mfsd246() throws IOException {
 		this.driver.get(mfsd246Url);
+		pageLoad();
 		Assert.hasLength(this.input.getAmc(), "For mfsd246 amc can't be null");
 	    Assert.notNull(this.input.getFoliolist(), "For mfsd246 folio list can't be null");
 	    Assert.isTrue(!this.input.getFoliolist().isEmpty(),"Folio list size can't be zero");
@@ -169,7 +203,73 @@ public class KarvyScrap implements Closeable{
 	    pageLoad();
 	}
 	
+	/**
+	 * <p>AUM file
+	 * @throws IOException
+	 */
+	public void mfsd203() throws IOException {
+		this.driver.get(mfsd203Url);
+		pageLoad();
+	    JavascriptExecutor jse = (JavascriptExecutor)this.driver;
+	    
+	    if(this.input.getAsOnDate()) {
+	    	
+	    	jse.executeScript("document.getElementById('"+karvyMfsd203asonradioLocator+"').click();");
+	    	
+	    	if(this.input.getTodate()!=null) {
+	    		SimpleDateFormat sdf=new SimpleDateFormat("dd/MM/yyyy");
+	    		try {
+	    			String date= sdf.format(this.input.getTodate())	;
+	    			driver.findElement(By.id(karvyMfsd203asoninputLocator)).sendKeys(date);
+	    		}catch(Exception e) {}
+	    	}	
+	    	
+	    }else{
+	    	  Assert.isTrue(false, "as on date should be true for aum file");
+	    }
+	    
+	    //select all amc
+	    jse.executeScript("document.getElementById('"+karvyMfsd203allAmcSelctLocator+"').click();");
+	    
+	    //select email
+	    jse.executeScript("document.getElementById('"+karvyMfsd203emailselctLocator+"').click();");
+        
+	    //select with zero balance
+    	jse.executeScript("document.getElementById('"+karvyMfsd203withzerobalLocator+"').click();");
+    	
+    	//select dbf file
+    	jse.executeScript("document.getElementById('"+karvyMfsd203dbffileLocator+"').click();");
+    	
+ 
+    	driver.findElement(By.id(karvyMfsd203zippas1Locator)).sendKeys(input.getZipPassword());
+    	
+    	driver.findElement(By.id(karvyMfsd203zippas2Locator)).sendKeys(input.getZipPassword());
+    	
+    	jse.executeScript("document.getElementById('"+karvyMfsd203submitLocator+"').click();");
+	    
+	    pageLoad();
+	}
+	
 	public KarvyScrap captureReferenceNo() {
+		//this logic can change file to file need fix accordingly
+		List<WebElement> allParag=this.driver.findElements(By.tagName("p"));
+		
+		String txt="execution queue with the reference number ";
+		for(WebElement p:allParag) {
+			if(p.getText().contains(txt) && this.input.getFiletype().equalsIgnoreCase("mfsd246")) {
+				String s=p.getText();
+				int index=s.indexOf(txt);
+				String ref=s.substring(index+txt.length(), index+txt.length()+15);
+		
+				this.refNo = ref.substring(0,ref.indexOf(" ."));
+				
+				break;
+			}else if(p.getText().contains(txt) && this.input.getFiletype().equalsIgnoreCase("mfsd203")) {
+				String s=p.findElement(By.tagName("b")).getText().trim();
+				
+				this.refNo =s;
+			}
+		}
 		
 		return this;
 	}
