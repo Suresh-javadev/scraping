@@ -51,4 +51,38 @@ public class ScrapController {
 		return ResponseEntity.ok(resp);
 	}
 
+	@PostMapping("/scrap/cams")
+	public ResponseEntity<ScrapResponse> scrapCams(@RequestBody ScrapingRequest req) {
+		ScrapResponse resp=new ScrapResponse();
+		WebDriver driver= LoadDriver.driver();
+		CamsScrap scrap=context.getBean(CamsScrap.class);
+		try {			
+				scrap
+				.setDriver(driver,req)
+				.start()
+				.close();
+				
+				resp.setRefNo(scrap.refNo());
+				resp.setStatus(ScrapResponse.Status.SUCCESS);
+		}catch(FailToLoadSiteException | LoginException e) {
+			resp.setStatus(ScrapResponse.Status.ERROR);
+			resp.setMessage(e.getMessage());
+		}catch(RuntimeException e) {
+			scrap.close();
+			
+			resp.setStatus(ScrapResponse.Status.ERROR);
+			
+			if(e.getMessage().contains("Alert text : User Name and Password does not match"))
+				resp.setMessage("User Name and Password does not match");
+			else
+				resp.setMessage(e.getMessage());
+		}catch(Exception e) {
+			scrap.close();
+			
+			resp.setStatus(ScrapResponse.Status.ERROR);
+			resp.setMessage(e.getMessage());
+		}
+		
+		return ResponseEntity.ok(resp);
+	}
 }
