@@ -13,7 +13,9 @@ import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -52,8 +54,8 @@ public class CamsScrap implements Closeable{
 		}
 		
 		return this
-		.login();
-		//.filetype()
+		.login()
+		.filetype();
 		//.captureReferenceNo();
 	}
 	
@@ -74,6 +76,25 @@ public class CamsScrap implements Closeable{
 		JavascriptExecutor executor = (JavascriptExecutor)driver;
 		executor.executeScript("arguments[0].click();", proceedButton);
 		pageLoad();
+		
+		WebDriverWait wait = new WebDriverWait(this.driver, 20);
+		
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.tagName("mat-select")));
+		//mat-pseudo-checkbox
+		WebElement activateMfselect =  this.driver.findElement(By.tagName("mat-select"));
+		executor.executeScript("arguments[0].click();", activateMfselect);
+		
+		
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.tagName("mat-pseudo-checkbox")));
+		
+		WebElement selectAllMf =  this.driver.findElement(By.tagName("mat-pseudo-checkbox"));
+		executor.executeScript("arguments[0].click();", selectAllMf);
+		//cdk-overlay-container
+		pageLoad();
+		WebElement overlay =  this.driver.findElement(By.className("cdk-overlay-container"));
+		executor.executeScript("arguments[0].click();", overlay);
+		
+		
 		return this;
 	}
 	
@@ -110,7 +131,37 @@ public class CamsScrap implements Closeable{
 	 * @throws IOException
 	 */
 	public void wbr2() throws IOException {
-
+		WebDriverWait wait = new WebDriverWait(this.driver, 20);
+		
+		JavascriptExecutor executor = (JavascriptExecutor)driver;
+		
+		//report section
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@id='mat-tab-label-0-1' and @class='mat-tab-label mat-ripple ng-star-inserted']")));
+		WebElement customerServicesSection =  this.driver.findElement(By.xpath("//div[@id='mat-tab-label-0-1' and @class='mat-tab-label mat-ripple ng-star-inserted']"));
+		executor.executeScript("arguments[0].click();", customerServicesSection);
+		executor.executeScript("arguments[0].click();", customerServicesSection);
+		
+		//select report type wbr2
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//ul//li[contains(.,'WBR2.')]")));
+		WebElement menuReport2 =  this.driver.findElement(By.xpath("//ul//li[contains(.,'WBR2.')]"));
+		executor.executeScript("arguments[0].click();", menuReport2);
+				
+		//select email file link
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//mat-select//div//div//span//span[contains(.,'Email an encrypted')]")));
+		WebElement emailAlink =  this.driver.findElement(By.xpath("//mat-select//div//div//span//span[contains(.,'Email an encrypted')]"));
+		executor.executeScript("arguments[0].click();", emailAlink);
+		
+		
+		//select email option link
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//mat-option//span[contains(.,'Email a download link')]")));
+		WebElement emailAlinkOption =  this.driver.findElement(By.xpath("//mat-option//span[contains(.,'Email a download link')]"));
+		executor.executeScript("arguments[0].click();", emailAlinkOption);
+		
+		//mat-checkbox-2
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@type='checkbox' and @class='mat-checkbox-input cdk-visually-hidden']")));
+		WebElement encryptionCheckbox =  this.driver.findElement(By.xpath("//input[@type='checkbox' and @class='mat-checkbox-input cdk-visually-hidden']"));
+		executor.executeScript("arguments[0].click();", encryptionCheckbox);
+		
 	    pageLoad();
 	}
 	
@@ -119,7 +170,30 @@ public class CamsScrap implements Closeable{
 	 * @throws IOException
 	 */
 	public void wbr22() throws IOException {
+		//filesection selection -- mat-tab-label-0-1 = customer services
+		WebDriverWait wait = new WebDriverWait(this.driver, 20);
 		
+		JavascriptExecutor executor = (JavascriptExecutor)driver;
+		//report section
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("mat-tab-label-0-1")));
+		WebElement customerServicesSection =  this.driver.findElement(By.id("mat-tab-label-0-1"));
+		executor.executeScript("arguments[0].click();", customerServicesSection);
+		
+		//select report type wbr22
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//ul//li[contains(.,'WBR22.')]")));
+		WebElement menuReport22 =  this.driver.findElement(By.xpath("//ul//li[contains(.,'WBR22.')]"));
+		executor.executeScript("arguments[0].click();", menuReport22);
+
+		//mat-checkbox-2
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@type='checkbox' and @class='mat-checkbox-input cdk-visually-hidden']")));
+		WebElement encryptionCheckbox =  this.driver.findElement(By.xpath("//input[@type='checkbox' and @class='mat-checkbox-input cdk-visually-hidden']"));
+		executor.executeScript("arguments[0].click();", encryptionCheckbox);
+		
+		
+		//select email file link
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//mat-select//div//div//span//span[contains(.,'Email an encrypted')]")));
+		WebElement emailAlink =  this.driver.findElement(By.xpath("//mat-select//div//div//span//span[contains(.,'Email an encrypted')]"));
+		executor.executeScript("arguments[0].click();", emailAlink);
 	    pageLoad();
 	}
 	

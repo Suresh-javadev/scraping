@@ -3,6 +3,8 @@ package org.ans.scraping;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 
 public class ScrapingRequest implements FileRequestInput{
 
@@ -10,7 +12,9 @@ public class ScrapingRequest implements FileRequestInput{
 	private String password;
 	private String amc;
 	private String filetype;
+	@JsonFormat(pattern="dd-MM-yyyy",timezone="Asia/Kolkata")
 	private Date fromdate;
+	@JsonFormat(pattern="dd-MM-yyyy",timezone="Asia/Kolkata")
 	private Date todate;
 	private String zipPassword;
 	private boolean asOnDate;

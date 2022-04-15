@@ -79,7 +79,10 @@ public class KarvyScrap implements Closeable{
 	private String karvyMfsd203zippas2Locator;
 	@Value("${karvy.mfsd203.submit.locator}")
 	private String karvyMfsd203submitLocator;
-
+	
+	//karvymfsd201
+	@Value("${karvy.MFSD201.url}")
+	private String mfsd201Url;
 	
 	private WebDriver driver;
 	private String refNo="";
@@ -151,6 +154,8 @@ public class KarvyScrap implements Closeable{
 			this.mfsd246();
 		}else if(this.input.getFiletype().equalsIgnoreCase("mfsd203")) {
 			this.mfsd203();
+		}else if(this.input.getFiletype().equalsIgnoreCase("mfsd201")) {
+			this.mfsd201();
 		}
 		return this;
 	}
@@ -249,6 +254,60 @@ public class KarvyScrap implements Closeable{
 	    
 	    pageLoad();
 	}
+
+	/**
+	 * <p>Transaction file
+	 * @throws IOException
+	 */
+	public void mfsd201() throws IOException {
+		Assert.notNull(this.input.getFromdate(), "From date is required");
+		Assert.notNull(this.input.getTodate(), "From date is required");
+		
+		this.driver.get(mfsd201Url);
+		pageLoad();
+	    JavascriptExecutor jse = (JavascriptExecutor)this.driver;
+	    //ctl00_MiddleContent_fromdatetodate1_txtDate  from
+	    //ctl00_MiddleContent_fromdatetodate1_txtToDtn to
+
+	    if(this.input.getTodate()!=null) {
+	    	SimpleDateFormat sdf=new SimpleDateFormat("dd/MM/yyyy");
+	    	try {
+	    		String fromdate= sdf.format(this.input.getFromdate());
+	    		String todate= sdf.format(this.input.getTodate());
+	    		WebElement from=driver.findElement(By.id("ctl00_MiddleContent_fromdatetodate1_txtDate"));
+	    		from.clear();
+	    		from.sendKeys(fromdate);
+	    		
+	    		WebElement to=driver.findElement(By.id("ctl00_MiddleContent_fromdatetodate1_txtToDtn"));
+	    		to.clear();
+	    		to.sendKeys(todate);
+	    		
+	    	}catch(Exception e) {}
+	    }	
+	    	
+	 
+	    
+	    //select all amc
+	    jse.executeScript("document.getElementById('ctl00_MiddleContent_FundsSchemes1_selFunds_0').click();");
+	    
+	    //select email
+	    jse.executeScript("document.getElementById('chkmailid0').click();");
+        
+	    //select with split
+    	jse.executeScript("document.getElementById('ctl00_MiddleContent_rdWithLoad').click();");
+    	
+    	//select dbf file
+    	jse.executeScript("document.getElementById('ctl00_MiddleContent_filefrmt_rblfileformat_2').click();");
+    	
+ 
+    	driver.findElement(By.id("ctl00_MiddleContent_filefrmt_txtZipPwd")).sendKeys(input.getZipPassword());
+    	
+    	driver.findElement(By.id("ctl00_MiddleContent_filefrmt_txtconfirmzippwd")).sendKeys(input.getZipPassword());
+    	
+    	jse.executeScript("document.getElementById('ctl00_MiddleContent_BtnReq').click();");
+	    
+	    pageLoad();
+	}	
 	
 	public KarvyScrap captureReferenceNo() {
 		//this logic can change file to file need fix accordingly
@@ -266,6 +325,10 @@ public class KarvyScrap implements Closeable{
 				break;
 			}else if(p.getText().contains(txt) && this.input.getFiletype().equalsIgnoreCase("mfsd203")) {
 				String s=p.findElement(By.tagName("b")).getText().trim();
+				
+				this.refNo =s;
+			}else if(p.getText().contains(txt) && this.input.getFiletype().equalsIgnoreCase("mfsd201")) {
+				String s=p.findElements(By.tagName("b")).get(1).getText().trim();
 				
 				this.refNo =s;
 			}
