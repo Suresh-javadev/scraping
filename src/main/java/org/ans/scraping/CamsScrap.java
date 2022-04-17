@@ -9,10 +9,12 @@ import org.ans.scraping.exception.FailToLoadSiteException;
 import org.ans.scraping.exception.LoginException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -55,8 +57,8 @@ public class CamsScrap implements Closeable{
 		
 		return this
 		.login()
-		.filetype();
-		//.captureReferenceNo();
+		.filetype()
+		.captureReferenceNo();
 	}
 	
 	private CamsScrap login() throws LoginException{
@@ -79,21 +81,21 @@ public class CamsScrap implements Closeable{
 		
 		WebDriverWait wait = new WebDriverWait(this.driver, 20);
 		
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.tagName("mat-select")));
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/app-root/div/app-reports/div/div[1]/div[1]/form/div/div[2]/mat-form-field/div/div[1]/div[3]/mat-select/div/div[1]")));
 		//mat-pseudo-checkbox
-		WebElement activateMfselect =  this.driver.findElement(By.tagName("mat-select"));
+		WebElement activateMfselect =  this.driver.findElement(By.xpath("/html/body/app-root/div/app-reports/div/div[1]/div[1]/form/div/div[2]/mat-form-field/div/div[1]/div[3]/mat-select/div/div[1]"));
 		executor.executeScript("arguments[0].click();", activateMfselect);
 		
-		
+		sleep(2000);
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.tagName("mat-pseudo-checkbox")));
 		
 		WebElement selectAllMf =  this.driver.findElement(By.tagName("mat-pseudo-checkbox"));
 		executor.executeScript("arguments[0].click();", selectAllMf);
 		//cdk-overlay-container
-		pageLoad();
-		WebElement overlay =  this.driver.findElement(By.className("cdk-overlay-container"));
-		executor.executeScript("arguments[0].click();", overlay);
 		
+		sleep(10000);
+		
+		pageLoad();
 		
 		return this;
 	}
@@ -136,31 +138,84 @@ public class CamsScrap implements Closeable{
 		JavascriptExecutor executor = (JavascriptExecutor)driver;
 		
 		//report section
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@id='mat-tab-label-0-1' and @class='mat-tab-label mat-ripple ng-star-inserted']")));
-		WebElement customerServicesSection =  this.driver.findElement(By.xpath("//div[@id='mat-tab-label-0-1' and @class='mat-tab-label mat-ripple ng-star-inserted']"));
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/app-root/div/app-reports/div/div[2]/div/div[2]/div[2]/div[1]/div/mat-tab-group/mat-tab-header/div[2]/div/div/div[2]/div[1]")));
+		WebElement customerServicesSection =  this.driver.findElement(By.xpath("/html/body/app-root/div/app-reports/div/div[2]/div/div[2]/div[2]/div[1]/div/mat-tab-group/mat-tab-header/div[2]/div/div/div[2]/div[1]"));
+		executor.executeScript("arguments[0].click();", customerServicesSection);	
+		sleep(2000);
 		executor.executeScript("arguments[0].click();", customerServicesSection);
-		executor.executeScript("arguments[0].click();", customerServicesSection);
-		
 		//select report type wbr2
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//ul//li[contains(.,'WBR2.')]")));
-		WebElement menuReport2 =  this.driver.findElement(By.xpath("//ul//li[contains(.,'WBR2.')]"));
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/app-root/div/app-reports/div/div[2]/div/div[2]/div[1]/ul/li[2]")));
+		WebElement menuReport2 =  this.driver.findElement(By.xpath("/html/body/app-root/div/app-reports/div/div[2]/div/div[2]/div[1]/ul/li[2]"));
 		executor.executeScript("arguments[0].click();", menuReport2);
-				
+		
+		sleep(1000);
 		//select email file link
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//mat-select//div//div//span//span[contains(.,'Email an encrypted')]")));
 		WebElement emailAlink =  this.driver.findElement(By.xpath("//mat-select//div//div//span//span[contains(.,'Email an encrypted')]"));
 		executor.executeScript("arguments[0].click();", emailAlink);
 		
-		
+		sleep(1000);
 		//select email option link
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//mat-option//span[contains(.,'Email a download link')]")));
 		WebElement emailAlinkOption =  this.driver.findElement(By.xpath("//mat-option//span[contains(.,'Email a download link')]"));
 		executor.executeScript("arguments[0].click();", emailAlinkOption);
-		
-		//mat-checkbox-2
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@type='checkbox' and @class='mat-checkbox-input cdk-visually-hidden']")));
-		WebElement encryptionCheckbox =  this.driver.findElement(By.xpath("//input[@type='checkbox' and @class='mat-checkbox-input cdk-visually-hidden']"));
+
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/app-root/div/app-reports/div/div[2]/div/div[2]/div[2]/div[2]/form/div/div/div[3]/div[1]/mat-checkbox/label/div")));
+		WebElement encryptionCheckbox =  this.driver.findElement(By.xpath("/html/body/app-root/div/app-reports/div/div[2]/div/div[2]/div[2]/div[2]/form/div/div/div[3]/div[1]/mat-checkbox/label/div"));
 		executor.executeScript("arguments[0].click();", encryptionCheckbox);
+		
+		sleep(1000);
+		////*[@id="mat-input-11"]
+		SimpleDateFormat sdf=new SimpleDateFormat("dd-MMM-yyyy");
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/app-root/div/app-reports/div/div[2]/div/div[2]/div[2]/div[2]/form/div/div/div[29]/div/div[1]/div[1]/mat-form-field/div/div[1]/div[3]/input")));
+		WebElement fromDate =  this.driver.findElement(By.xpath("/html/body/app-root/div/app-reports/div/div[2]/div/div[2]/div[2]/div[2]/form/div/div/div[29]/div/div[1]/div[1]/mat-form-field/div/div[1]/div[3]/input"));
+	
+		executor.executeScript("arguments[0].removeAttribute('readonly','readonly')",fromDate);
+		sleep(1000);
+		executor.executeScript("arguments[0].setAttribute('value','')",fromDate);
+		sleep(1000);
+		fromDate.sendKeys(Keys.CONTROL + "a");
+		fromDate.sendKeys(Keys.DELETE);
+		fromDate.sendKeys(sdf.format(this.input.getFromdate()));
+		sleep(1000);
+		
+		
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/app-root/div/app-reports/div/div[2]/div/div[2]/div[2]/div[2]/form/div/div/div[29]/div/div[1]/div[2]/mat-form-field/div/div[1]/div[3]/input")));
+		WebElement toDate =  this.driver.findElement(By.xpath("/html/body/app-root/div/app-reports/div/div[2]/div/div[2]/div[2]/div[2]/form/div/div/div[29]/div/div[1]/div[2]/mat-form-field/div/div[1]/div[3]/input"));
+		sleep(1000);
+		executor.executeScript("arguments[0].removeAttribute('readonly','readonly')",toDate);
+		sleep(1500);
+		executor.executeScript("arguments[0].setAttribute('value','')",toDate);
+		sleep(2500);
+		
+		toDate.sendKeys(Keys.CONTROL + "a");
+		toDate.sendKeys(Keys.DELETE);
+		toDate.sendKeys(sdf.format(this.input.getTodate()));
+		
+		//select form submit
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@type='submit' and @value='Next']")));
+		WebElement formsubmit =  this.driver.findElement(By.xpath("//input[@type='submit' and @value='Next']"));
+		executor.executeScript("arguments[0].click();", formsubmit);
+		
+		//zippass1
+		// /html/body/app-root/div/app-reports/div/div[2]/div/div[2]/div[2]/div[3]/div/div/form/div/div/div[8]/div[1]/mat-form-field/div/div[1]/div[3]/input
+		
+		sleep(1000);
+		//select form submit
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@type='password' and @formcontrolname='pwd1']")));
+		WebElement zippass1 =  this.driver.findElement(By.xpath("//input[@type='password' and @formcontrolname='pwd1']"));
+		zippass1.sendKeys(this.input.getZipPassword());
+		
+		
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@type='password' and @formcontrolname='pwd2']")));
+		WebElement zippass2 =  this.driver.findElement(By.xpath("//input[@type='password' and @formcontrolname='pwd2']"));
+		zippass2.sendKeys(this.input.getZipPassword());
+		
+		
+		// /html/body/app-root/div/app-reports/div/div[2]/div/div[2]/div[2]/div[3]/div/div/form/div/div/div[10]/div[2]/input[1]
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@type='Submit' and @value='IMMEDIATE']")));
+		WebElement imediateSubmit =  this.driver.findElement(By.xpath("//input[@type='Submit' and @value='IMMEDIATE']"));
+		executor.executeScript("arguments[0].click();", imediateSubmit);
 		
 	    pageLoad();
 	}
@@ -199,22 +254,14 @@ public class CamsScrap implements Closeable{
 	
 	public CamsScrap captureReferenceNo() {
 		//this logic can change file to file need fix accordingly
-		List<WebElement> allParag=this.driver.findElements(By.tagName("p"));
+		List<WebElement> allParag=this.driver.findElements(By.tagName("b"));
 		
-		String txt="execution queue with the reference number ";
 		for(WebElement p:allParag) {
-			if(p.getText().contains(txt) && this.input.getFiletype().equalsIgnoreCase("mfsd246")) {
-				String s=p.getText();
-				int index=s.indexOf(txt);
-				String ref=s.substring(index+txt.length(), index+txt.length()+15);
-		
-				this.refNo = ref.substring(0,ref.indexOf(" ."));
+			if(p.getText().contains(this.input.getFiletype().toUpperCase())) {
+				
+				this.refNo = p.getText().replace(" ", "").trim().replace("WB", "");
 				
 				break;
-			}else if(p.getText().contains(txt) && this.input.getFiletype().equalsIgnoreCase("mfsd203")) {
-				String s=p.findElement(By.tagName("b")).getText().trim();
-				
-				this.refNo =s;
 			}
 		}
 		
@@ -259,5 +306,11 @@ public class CamsScrap implements Closeable{
 	    } catch (NoAlertPresentException Ex){ 
 	        return false; 
 	    }   
+	}
+	
+	private void sleep(int mili) {
+		try {
+			Thread.sleep(mili);
+		}catch(Exception e) {}
 	}
 }
